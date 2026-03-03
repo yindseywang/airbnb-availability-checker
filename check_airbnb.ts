@@ -1,4 +1,21 @@
 import { chromium } from 'playwright';
+import { CronJob } from 'cron';
+
+// This job runs every day at 8:00 AM (server time, which is UTC)
+// Since you are in Mountain Time (UTC-7), 8 AM MT = 3 PM UTC (15:00)
+const dailyHealthCheck = new CronJob('0 15 * * *', async () => {
+    try {
+        await fetch('https://ntfy.sh/yinzi_airbnb_alerts', {
+            method: 'POST',
+            body: `🌅 Morning Check-in: Your Airbnb checker script is still online and actively checking for you!`
+        });
+        console.log("Sent daily health check notification.");
+    } catch (e) {
+        console.error("Failed to send daily health check notification:", e);
+    }
+});
+
+dailyHealthCheck.start();
 
 async function checkAvailability() {
     const browser = await chromium.launch({ headless: true });
